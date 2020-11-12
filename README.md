@@ -3,8 +3,9 @@
 ## Requirements
 * nasm
 * make
+* binutils
 ```
-sudo apt install nasm make
+sudo apt install nasm make binutils
 ```
 
 ## To Build

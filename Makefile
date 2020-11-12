@@ -10,7 +10,8 @@ OUT_DIR := out
 TARGETS = ${OUT_DIR}/00-hello-world.elf \
           ${OUT_DIR}/01-procedure-calls.elf \
 		  ${OUT_DIR}/02-nx-stack.elf \
-		  ${OUT_DIR}/03-section-table.elf
+		  ${OUT_DIR}/03-section-table.elf \
+		  ${OUT_DIR}/04-execve.elf
 
 .PHONY: clean all
 

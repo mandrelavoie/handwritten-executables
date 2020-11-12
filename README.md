@@ -1,4 +1,4 @@
-# A collection of hand-written executables
+# A collection of handwritten executables
 
 ## Requirements
 * nasm

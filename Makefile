@@ -15,9 +15,9 @@ TARGETS = ${OUT_DIR}/00-hello-world.elf \
 ${OUT_DIR}:
 	@${MKDIR} $@
 
-${OUT_DIR}/%: ${OUT_DIR}
-	${NASM} ${NASMFLAGS} -o $@ ${SRC_DIR}/$*.S
-	${CHMOD} $@
+${OUT_DIR}/%: ${SRC_DIR}/%.S ${OUT_DIR} 
+	${NASM} ${NASMFLAGS} -o $@ $<
+	@${CHMOD} $@
 
 clean:
 	@rm -rf ${OUT_DIR}

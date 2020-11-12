@@ -16,7 +16,7 @@ elf_header:
     dq 0x0000000000000000           ; Section Header Offset                  e_shoff
     dd 0x00000000                   ; Processor-specific Flags               e_flags
     dw program_header - elf_header  ; ELF Header Size                        e_ehsize
-    dw text - program_header      ; Program Header Size                    e_phentsize
+    dw text - program_header        ; Program Header Size                    e_phentsize
     dw 0x0001                       ; Program Header Count                   e_phnum
     dw 0x0000                       ; Section Header Size                    e_shentsize
     dw 0x0000                       ; Section Header Count                   e_shnum
@@ -35,6 +35,7 @@ program_header:
 
 text:
 strlen:
+    xor rax, rax
     mov rcx, -1
     repnz scasb
     not rcx

@@ -13,7 +13,8 @@ TARGETS = ${OUT_DIR}/00-hello-world.elf \
 		  ${OUT_DIR}/03-section-table.elf \
 		  ${OUT_DIR}/04-execve.elf \
 		  ${OUT_DIR}/05-bss.elf \
-		  ${OUT_DIR}/06-rodata.elf
+		  ${OUT_DIR}/06-rodata.elf \
+		  ${OUT_DIR}/07-shared-library.so
 
 .PHONY: clean all
 

@@ -16,10 +16,10 @@ elf_header:
     dd 0x00000000                   ; Processor-specific Flags               e_flags
     dw 0x0040                       ; ELF Header Size                        e_ehsize
     dw 0x0038                       ; Program Header Size                    e_phentsize
-    dw 0x0006                       ; Program Header Count                   e_phnum
+    dw 0x0007                       ; Program Header Count                   e_phnum
     dw 0x0040                       ; Section Header Size                    e_shentsize
-    dw 0x0006                       ; Section Header Count                   e_shnum
-    dw 0x0001                       ; String Table                           e_shstrndx
+    dw 0x0007                       ; Section Header Count                   e_shnum
+    dw 0x0002                       ; String Table                           e_shstrndx
 
 program_header:
     ; [0] (Headers Segment)
@@ -58,7 +58,7 @@ program_header:
     dq eof - rodata                 ; Size of Segment in File                p_filesz
     dq eof - rodata                 ; Size of Segment in Memory              p_memsz
     dq 0x0000000000001000           ; Alignment of Segment                   p_align
-    ; [3] (Dynamic Segment)
+    ; [4] (Dynamic Segment)
     dd 0x00000001                   ; Type of Segment (Loadable)              p_type
     dd 0x00000006                   ; Segment Attributes (Read | Write)      p_flags
     dq dynamic - $$                 ; Offset in File                         p_offset
@@ -67,7 +67,7 @@ program_header:
     dq headers_end - dynamic        ; Size of Segment in File                p_filesz
     dq headers_end - dynamic        ; Size of Segment in Memory              p_memsz
     dq 0x0000000000001000           ; Alignment of Segment                   p_align
-    ; [4] (Dynamic Segment)
+    ; [5] (Dynamic Segment)
     dd 0x00000002                   ; Type of Segment (Dynamic)              p_type
     dd 0x00000006                   ; Segment Attributes (Read | Write)      p_flags
     dq dynamic - $$                 ; Offset in File                         p_offset
@@ -76,7 +76,7 @@ program_header:
     dq headers_end - dynamic        ; Size of Segment in File                p_filesz
     dq headers_end - dynamic        ; Size of Segment in Memory              p_memsz
     dq 0x0000000000000008           ; Alignment of Segment                   p_align
-    ; [5] (Stack Segment)
+    ; [6] (Stack Segment)
     dd 0x6474e551                   ; Type of Segment (GNU_STACK)            p_type
     dd 0x00000000                   ; Segment Attributes                     p_flags
     dq 0x0000000000000000           ; Offset in File                         p_offset
@@ -87,7 +87,18 @@ program_header:
     dq 0x0000000000000008           ; Alignment of Segment                   p_align
 
 section_header:
-    ; [0] (.text)
+    ; [0] (.null)
+    dd 0x00000000                   ; Section Name                           sh_name
+    dd 0x00000000                   ; Section Type (PROGBITS)                sh_type
+    dq 0x0000000000000000           ; Section Attributes (Alloc | Exec)      sh_flags
+    dq 0x0000000000000000           ; Virtual Address in Memory              sh_addr
+    dq 0x0000000000000000           ; Offset in File                         sh_offset
+    dq 0x0000000000000000           ; Size of Section                        sh_size
+    dd 0x0000000000000000           ; Link to Other Section                  sh_link
+    dd 0x0000000000000000           ; Miscellaneous Information              sh_info
+    dq 0x0000000000000000           ; Address Alignment                      sh_addralign
+    dq 0x0000000000000000           ; Size of Entry                          sh_entsize
+    ; [1] (.text)
     dd strtab_text - strtab         ; Section Name                           sh_name
     dd 0x00000001                   ; Section Type (PROGBITS)                sh_type
     dq 0x0000000000000006           ; Section Attributes (Alloc | Exec)      sh_flags
@@ -98,7 +109,7 @@ section_header:
     dd 0x00000000                   ; Miscellaneous Information              sh_info
     dq 0x0000000000000001           ; Address Alignment                      sh_addralign
     dq 0x0000000000000000           ; Size of Entry                          sh_entsize
-    ; [1] (.shstrtab)
+    ; [2] (.shstrtab)
     dd strtab_shstrtab - strtab     ; Section Name                           sh_name
     dd 0x00000003                   ; Section Type (STRTAB)                  sh_type
     dq 0x0000000000000000           ; Section Attributes                     sh_flags
@@ -109,7 +120,7 @@ section_header:
     dd 0x00000000                   ; Miscellaneous Information              sh_info
     dq 0x0000000000000001           ; Address Alignment                      sh_addralign
     dq 0x0000000000000000           ; Size of Entry                          sh_entsize
-    ; [2] (.rodata)
+    ; [3] (.rodata)
     dd strtab_rodata - strtab       ; Section Name                           sh_name
     dd 0x00000001                   ; Section Type (PROGBITS)                sh_type
     dq 0x0000000000000000           ; Section Attributes                     sh_flags
@@ -120,7 +131,7 @@ section_header:
     dd 0x00000000                   ; Miscellaneous Information              sh_info
     dq 0x0000000000000001           ; Address Alignment                      sh_addralign
     dq 0x0000000000000000           ; Size of Entry                          sh_entsize
-    ; [3] (.dynstr)
+    ; [4] (.dynstr)
     dd strtab_dynstr - strtab       ; Section Name                           sh_name
     dd 0x00000003                   ; Section Type (STRTAB)                  sh_type
     dq 0x0000000000000002           ; Section Attributes (Alloc)             sh_flags
@@ -131,22 +142,22 @@ section_header:
     dd 0x00000000                   ; Miscellaneous Information              sh_info
     dq 0x0000000000000001           ; Address Alignment                      sh_addralign
     dq 0x0000000000000000           ; Size of Entry                          sh_entsize
-    ; [4] (.dynsym)
+    ; [5] (.dynsym)
     dd strtab_dynsym - strtab       ; Section Name                           sh_name
     dd 0x0000000b                   ; Section Type (DYNSYM)                  sh_type
     dq 0x0000000000000002           ; Section Attributes (Alloc)             sh_flags
     dq dynsym                       ; Virtual Address in Memory              sh_addr
     dq dynsym - $$                  ; Offset in File                         sh_offset
     dq dynamic - dynsym             ; Size of Section                        sh_size
-    dd 0x00000003                   ; Link to Other Section (.dynstr)        sh_link
-    dd 0x00000002                   ; Miscellaneous Information (# symbols)  sh_info
+    dd 0x00000004                   ; Link to Other Section (.dynstr)        sh_link
+    dd 0x00000001                   ; Miscellaneous Information (# symbols)  sh_info
     dq 0x0000000000000001           ; Address Alignment                      sh_addralign
     dq 0x0000000000000018           ; Size of Entry                          sh_entsize
-    ; [5] (.dynamic)
+    ; [6] (.dynamic)
     dd strtab_dynamic - strtab      ; Section Name                           sh_name
     dd 0x00000006                   ; Section Type (DYNAMIC)                 sh_type
     dq 0x0000000000000003           ; Section Attributes (Alloc | Write)     sh_flags
-    dq eof                      ; Virtual Address in Memory              sh_addr
+    dq eof + 0x2000                          ; Virtual Address in Memory              sh_addr
     dq dynamic - $$                 ; Offset in File                         sh_offset
     dq headers_end - dynamic        ; Size of Section                        sh_size
     dd 0x00000003                   ; Link to Other Section (.dynstr)        sh_link
@@ -170,14 +181,14 @@ dynsym:
     dd 0x00000000                   ; Index of name in dynstr                st_name
     db 0x00                         ; Symbol Info                            st_info
     db 0x00                         ; Symbol Visibility (Default)            st_other
-    dw 0x0000                       ; Related Section (.text)                st_shndx
+    dw 0x0000                       ; Related Section                        st_shndx
     dq 0x0000000000000000           ; Symbol Value                           st_value
     dq 0x0000000000000000           ; Symbol Size                            st_size
     ; [1] The "say_hello" function
     dd dynstr_say_hello - dynstr    ; Index of name in dynstr                st_name
     db 0x12                         ; Symbol Info (GLOBAL | FUNCTION)        st_info
     db 0x00                         ; Symbol Visibility (Default)            st_other
-    dw 0x0000                       ; Related Section (.text)                st_shndx
+    dw 0x0001                       ; Related Section (.text)                st_shndx
     dq say_hello - $$               ; Symbol Value                           st_value
     dq say_hello_size               ; Symbol Size                            st_size
 dynamic:
@@ -242,10 +253,8 @@ dynamic:
     ; [-1] NULL (Must be last)
     dq 0x00000000               ; d_tag
     dq 0x0000000000000000       ; d_val
-
 headers_end:
 
-times 0x1000-($-$$) db 0
 text:
 strlen:
     xor rax, rax
@@ -273,9 +282,7 @@ say_hello:
     ret
 say_hello_size: equ $ - say_hello
 
-times 0x2000-($-$$) db 0
 rodata:
     message:
         db "Hello from shared library!", 0x0a, 0x00
 eof:
-times 0x200 db 0

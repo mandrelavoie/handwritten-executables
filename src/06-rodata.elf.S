@@ -73,7 +73,7 @@ section_header:
     dq 0x0000000000000001           ; Address Alignment                      sh_addralign
     dq 0x0000000000000000           ; Size of Entry                          sh_entsize
     ; [1] (.shstrtab)
-    dd strtab_dynstr - strtab       ; Section Name                           sh_name
+    dd strtab_shstrtab - strtab     ; Section Name                           sh_name
     dd 0x00000003                   ; Section Type (STRTAB)                  sh_type
     dq 0x0000000000000000           ; Section Attributes                     sh_flags
     dq strtab                       ; Virtual Address in Memory              sh_addr
@@ -96,9 +96,9 @@ section_header:
     dq 0x0000000000000000           ; Size of Entry                          sh_entsize
 strtab:
     db 0x00
-    strtab_text:   db ".text", 0x00
-    strtab_dynstr: db ".shstrtab", 0x00
-    strtab_rodata: db ".rodata", 0x00
+    strtab_text:     db ".text", 0x00
+    strtab_shstrtab: db ".shstrtab", 0x00
+    strtab_rodata:   db ".rodata", 0x00
 
 times 0x1000-($-$$) db 0
 text:

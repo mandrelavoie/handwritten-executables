@@ -18,7 +18,7 @@ elf_header:
     dw 0x0038                       ; Program Header Size                    e_phentsize
     dw 0x0007                       ; Program Header Count                   e_phnum
     dw 0x0040                       ; Section Header Size                    e_shentsize
-    dw 0x0007                       ; Section Header Count                   e_shnum
+    dw 0x0008                       ; Section Header Count                   e_shnum
     dw 0x0002                       ; String Table                           e_shstrndx
 
 program_header:
@@ -76,7 +76,16 @@ program_header:
     dq headers_end - dynamic        ; Size of Segment in File                p_filesz
     dq headers_end - dynamic        ; Size of Segment in Memory              p_memsz
     dq 0x0000000000000008           ; Alignment of Segment                   p_align
-    ; [6] (Stack Segment)
+    ; [6] (Reloc Segment)
+    dd 0x6474e552                   ; Type of Segment (GNU_RELRO)            p_type
+    dd 0x00000004                   ; Segment Attributes (Read)              p_flags
+    dq dynamic - $$                 ; Offset in File                         p_offset
+    dq dynamic + 0x2000             ; Virtual Address in Memory              p_vaddr
+    dq 0x0000000000000000           ; Physical Address                       p_paddr
+    dq headers_end - dynamic        ; Size of Segment in File                p_filesz
+    dq 0xd18                        ; Size of Segment in Memory              p_memsz      ; Why??
+    dq 0x0000000000000001           ; Alignment of Segment                   p_align
+    ; [7] (Stack Segment)
     dd 0x6474e551                   ; Type of Segment (GNU_STACK)            p_type
     dd 0x00000000                   ; Segment Attributes                     p_flags
     dq 0x0000000000000000           ; Offset in File                         p_offset
@@ -157,10 +166,10 @@ section_header:
     dd strtab_dynamic - strtab      ; Section Name                           sh_name
     dd 0x00000006                   ; Section Type (DYNAMIC)                 sh_type
     dq 0x0000000000000003           ; Section Attributes (Alloc | Write)     sh_flags
-    dq eof + 0x2000                          ; Virtual Address in Memory              sh_addr
+    dq dynamic                      ; Virtual Address in Memory              sh_addr
     dq dynamic - $$                 ; Offset in File                         sh_offset
     dq headers_end - dynamic        ; Size of Section                        sh_size
-    dd 0x00000003                   ; Link to Other Section (.dynstr)        sh_link
+    dd 0x00000004                   ; Link to Other Section (.dynstr)        sh_link
     dd 0x00000000                   ; Miscellaneous Information              sh_info
     dq 0x0000000000000008           ; Address Alignment                      sh_addralign
     dq 0x0000000000000010           ; Size of Entry                          sh_entsize
@@ -177,7 +186,7 @@ dynstr:
     dynstr_say_hello: db "say_hello", 0x00
     dynstr_so_name:   db "07-shared-library.so", 0x00
 dynsym:
-    ; [0] First one needs to be all zeroes, apparently ?
+    ; [0] First one needs to be all zeroes, apparently.
     dd 0x00000000                   ; Index of name in dynstr                st_name
     db 0x00                         ; Symbol Info                            st_info
     db 0x00                         ; Symbol Visibility (Default)            st_other
@@ -229,11 +238,6 @@ dynamic:
     ; DT_PREINIT_ARRAYSZ        33                size in bytes of DT_PREINIT_ARRAY
     ; DT_SYMTAB_SHNDX           34                Address of SYMTAB_SHNDX section
     ; DT_NUM                    35                Number used
-    ; DT_LOOS                   0x6000000d        Start of OS-specific
-    ; DT_HIOS                   0x6ffff000        End of OS-specific
-    ; DT_LOPROC                 0x70000000        Start of processor-specific
-    ; DT_HIPROC                 0x7fffffff        End of processor-specific
-    ; DT_PROCNUM                DT_MIPS_NUM       Most used by any processor
     ;;
     ; [0] SONAME (Name of shared object)
     dq 14                       ; d_tag

@@ -60,7 +60,7 @@
 %define SHF_COMPRESSED         0x800
 
 %macro sh 10
-    dd %1 - strtab          ; Section Name                           sh_name
+    dd %1 - shstrtab        ; Section Name                           sh_name
     dd %2                   ; Section Type                           sh_type
     dq %3                   ; Section Attributes                     sh_flags
     dq %4                   ; Virtual Address in Memory              sh_addr
